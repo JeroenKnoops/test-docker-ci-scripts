@@ -13,7 +13,6 @@ jobs:
       with:
         submodules: true
 
-    - name: Build Docker Image
     - uses: github.com/jeroenknoops/docker-ci-scripts@4f73d560ba065c110914500f47b6cff94e5a21aa
       with:
         dockerfile: 1
