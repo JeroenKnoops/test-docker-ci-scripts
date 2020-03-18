@@ -9,9 +9,7 @@ jobs:
 
     steps:
 
-    - uses: actions/checkout@v1
-      with:
-        submodules: true
+    - uses: actions/checkout@v2
 
     - uses: philips-software/docker-ci-scripts@REPO-tag
       with:
