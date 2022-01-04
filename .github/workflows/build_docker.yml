@@ -1,0 +1,30 @@
+on: [push]
+
+name: test
+
+jobs:
+  build:
+    name: Build docker image 
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - uses: philips-software/docker-ci-scripts@add-digest-outputs
+      id: docker
+      with:
+        dockerfile: 1
+        image-name: test-image 
+        tags: 'lasest 1 1.2 1.2.1'
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
+        DOCKER_ORGANIZATION: jeroenknoops
+
+    - name: Output digest
+      run: |
+        echo "container-digest: ${{ steps.docker.outputs.container-digest }}"
+        echo "container-tags: ${{ steps.docker.outputs.container-tags }}"
