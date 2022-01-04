@@ -47,7 +47,7 @@ jobs:
         with:
           command: generate
           subcommand: container
-          arguments: --repository $GITHUB_REPOSITORY --digest ${{ needs.build.outputs.container-digest }} --tags ${{ needs.build.outputs.container-tags }}
+          arguments: --repository jeroenknoops/test-docker-ci-scripts --digest ${{ needs.build.outputs.container-digest }} --tags ${{ needs.build.outputs.container-tags }}
 
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
