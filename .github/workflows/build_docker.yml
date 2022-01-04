@@ -5,10 +5,12 @@ name: test
 jobs:
   build:
     name: Build docker image 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
+    outputs:
+      container-digest: ${{ steps.docker.outputs.container-digest }}
+      container-tags: ${{ steps.docker.outputs.container-tags }}
 
     steps:
-
     - uses: actions/checkout@v1
       with:
         submodules: true
@@ -18,7 +20,7 @@ jobs:
       with:
         dockerfile: 1
         image-name: test-image 
-        tags: 'lasest 1 1.2 1.2.1'
+        tags: 'latest 1 1.2 1.2.1'
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
@@ -28,3 +30,49 @@ jobs:
       run: |
         echo "container-digest: ${{ steps.docker.outputs.container-digest }}"
         echo "container-tags: ${{ steps.docker.outputs.container-tags }}"
+
+  container-provenance:
+    name: container-provenance
+    needs: [build]
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v1.4.1
+        with:
+          cosign-release: 'v1.4.1'
+
+      - name: Generate provenance
+        uses: philips-labs/slsa-provenance-action@v0.5.0
+        with:
+          command: generate
+          subcommand: container
+          arguments: --repository $GITHUB_REPOSITORY --digest ${{ needs.build.outputs.container-digest }} --tags ${{ needs.build.outputs.container-tags }}
+
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Debug provenance
+        run: |
+          cat provenance.json
+
+      - name: Login to Container registries
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Attach provenance to image
+        run: |
+          echo '${{ secrets.COSIGN_PRIVATE_KEY }}' > cosign.key
+          cosign attest --predicate provenance.json --key cosign.key $GITHUB_REPOSITORY@${{ needs.build.outputs.container-digest }}
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+
+      - name: Verify attestation
+        run: |
+          echo '${{ secrets.COSIGN_PUBLIC_KEY }}' > cosign.pub
+          cosign verify-attestation --key cosign.pub $GITHUB_REPOSITORY@${{ needs.build.outputs.container-digest }}
+
+      - name: Logout from Container registries
+        if: ${{ always() }}
+        run: |
+          docker logout
