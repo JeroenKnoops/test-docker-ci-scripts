@@ -10,13 +10,14 @@ jobs:
       container-digest: ${{ steps.docker.outputs.container-digest }}
       container-tags: ${{ steps.docker.outputs.container-tags }}
       container-repo: jeroenknoops/test-image
+      push-indicator: ${{ steps.docker.outputs.push-indicator }}
 
     steps:
     - uses: actions/checkout@v1
       with:
         submodules: true
 
-    - uses: philips-software/docker-ci-scripts@add-digest-outputs
+    - uses: philips-software/docker-ci-scripts@main
       id: docker
       with:
         dockerfile: 1
@@ -31,10 +32,12 @@ jobs:
       run: |
         echo "container-digest: ${{ steps.docker.outputs.container-digest }}"
         echo "container-tags: ${{ steps.docker.outputs.container-tags }}"
+        echo "push-indicator: ${{ steps.docker.outputs.push-indicator }}"
 
   container-provenance:
     name: container-provenance
     needs: [build]
+    if: needs.build.outputs.push-indicator == 'true'
     runs-on: ubuntu-20.04
 
     steps:
