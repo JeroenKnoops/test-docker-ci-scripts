@@ -88,8 +88,26 @@ jobs:
       - name: Upload sbom 
         uses: actions/upload-artifact@v2
         with:
-          name: bom 
+          name: bom-k8s-sigs
           path: jeroenknoops-test-image-k8s-bom.txt
+          retention-days: 5
+
+      - uses: philips-labs/tern-action@v1.3.0
+        id: scan
+        with:
+          image: jeroenknoops/test-image:latest
+          format: spdxtagvalue
+          output: jeroenknoops-test-image.txt
+
+      - name: Debug SBOM 
+        run: |
+          cat jeroenknoops-test-image.txt
+
+      - name: Upload sbom 
+        uses: actions/upload-artifact@v2
+        with:
+          name: bom-tern
+          path: jeroenknoops-test-image.txt
           retention-days: 5
 
   container-provenance:
