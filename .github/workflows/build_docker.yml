@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - add-tern
-
+      - add-k8s-sigs-bom
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
         dockerfile: 1
         image-name: test-image 
         tags: 'latest 1 1.2 1.2.1'
-        push-branches: 'main add-tern'
+        push-branches: 'main add-tern add-k8s-sigs-bom'
       env:
         DOCKER_USERNAME: jeroenknoops 
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
@@ -45,6 +45,9 @@ jobs:
     if: needs.build.outputs.push-indicator == 'true'
     runs-on: ubuntu-20.04
     steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
       - uses: philips-labs/tern-action@v1.3.0
         id: scan
         with:
@@ -61,6 +64,32 @@ jobs:
         with:
           name: sbom 
           path: jeroenknoops-test-image.json
+          retention-days: 5
+
+  bom:
+    name: software-bill-of-material-k8s-sigs
+    needs: [build]
+    if: needs.build.outputs.push-indicator == 'true'
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.17.2' 
+      - name: Install bom
+        run: |
+          go install sigs.k8s.io/bom/cmd/bom@latest
+          bom generate -n jeroenknoops-test-image --image jeroenknoops/test-image:latest > jeroenknoops-test-image-k8s-bom.txt
+      - name: Debug SBOM 
+        run: |
+          cat jeroenknoops-test-image-k8s-bom.txt
+      - name: Upload sbom 
+        uses: actions/upload-artifact@v2
+        with:
+          name: bom 
+          path: jeroenknoops-test-image-k8s-bom.txt
           retention-days: 5
 
   container-provenance:
