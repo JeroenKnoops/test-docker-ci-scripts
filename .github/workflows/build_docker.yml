@@ -81,7 +81,7 @@ jobs:
       - name: Install bom
         run: |
           go install sigs.k8s.io/bom/cmd/bom@latest
-          bom generate -n jeroenknoops-test-image --image jeroenknoops/test-image:latest > jeroenknoops-test-image-k8s-bom.txt
+          bom generate -n jeroenknoops-test-image --image jeroenknoops/test-image:latest -a > jeroenknoops-test-image-k8s-bom.txt
       - name: Debug SBOM 
         run: |
           cat jeroenknoops-test-image-k8s-bom.txt
