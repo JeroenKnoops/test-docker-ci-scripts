@@ -17,7 +17,7 @@ jobs:
       with:
         submodules: true
 
-    - uses: philips-software/docker-ci-scripts@main
+    - uses: philips-software/docker-ci-scripts@add-slsa-provenance
       id: docker
       with:
         dockerfile: 1
