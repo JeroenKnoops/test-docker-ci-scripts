@@ -29,6 +29,13 @@ jobs:
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
         DOCKER_ORGANIZATION: jeroenknoops
 
+    - name: Upload a Build Artifact
+      uses: actions/upload-artifact@v2.3.1
+      with:
+        name: provenance.json
+        path: provenance.json 
+        retention-days: 5
+        
     - name: Output digest
       run: |
         echo "container-digest: ${{ steps.docker.outputs.container-digest }}"
@@ -46,16 +53,12 @@ jobs:
         uses: sigstore/cosign-installer@v1.4.1
         with:
           cosign-release: 'v1.4.1'
-
-      - name: Generate provenance
-        uses: philips-labs/slsa-provenance-action@fix-single-quote-in-commit
+          
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v2.1.0
         with:
-          command: generate
-          subcommand: container
-          arguments: --repository ${{ needs.build.outputs.container-repo }} --digest ${{ needs.build.outputs.container-digest }} --tags ${{ needs.build.outputs.container-tags }}
-
-        env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          name: provenance
+          path: provenance.json
 
       - name: Debug provenance
         run: |
