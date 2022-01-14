@@ -23,6 +23,7 @@ jobs:
         dockerfile: 1
         image-name: test-image 
         tags: 'latest 1 1.2 1.2.1'
+        push-branches: 'test-single-quote'
       env:
         DOCKER_USERNAME: jeroenknoops 
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
