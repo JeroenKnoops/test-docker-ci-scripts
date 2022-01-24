@@ -11,6 +11,7 @@ jobs:
       container-tags: ${{ steps.docker.outputs.container-tags }}
       container-repo: jeroenknoops/test-image
       push-indicator: ${{ steps.docker.outputs.push-indicator }}
+      slsa-provenance-file: ${{ steps.docker.outputs.slsa-provenance-file }}
 
     steps:
     - uses: actions/checkout@v1
