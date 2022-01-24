@@ -23,7 +23,7 @@ jobs:
         dockerfile: 1
         image-name: test-image 
         tags: 'latest 1 1.2 1.2.1'
-        cosign: true
+        slsa-provenance: true
       env:
         DOCKER_USERNAME: jeroenknoops 
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
@@ -33,7 +33,7 @@ jobs:
       uses: actions/upload-artifact@v2.3.1
       with:
         name: provenance
-        path: provenance.json 
+        path: ${{ steps.docker.outputs.slsa-provenance-file }}
         retention-days: 5
         
     - name: Output digest
