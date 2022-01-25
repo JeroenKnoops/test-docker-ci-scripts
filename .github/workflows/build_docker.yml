@@ -6,12 +6,6 @@ jobs:
   build:
     name: Build docker image 
     runs-on: ubuntu-20.04
-    outputs:
-      container-digest: ${{ steps.docker.outputs.container-digest }}
-      container-tags: ${{ steps.docker.outputs.container-tags }}
-      container-repo: jeroenknoops/test-image
-      push-indicator: ${{ steps.docker.outputs.push-indicator }}
-      slsa-provenance-file: ${{ steps.docker.outputs.slsa-provenance-file }}
 
     steps:
     - uses: actions/checkout@v1
