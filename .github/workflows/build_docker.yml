@@ -19,6 +19,7 @@ jobs:
         image-name: test-image 
         tags: 'latest 1 1.2 1.2.1'
         slsa-provenance: true
+        sign: true
       env:
         DOCKER_USERNAME: jeroenknoops 
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
