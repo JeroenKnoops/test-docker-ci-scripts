@@ -12,7 +12,7 @@ jobs:
       with:
         submodules: true
 
-    - uses: philips-software/docker-ci-scripts@attach-provenance-to-image
+    - uses: philips-software/docker-ci-scripts@sign-docker-image
       id: docker
       with:
         dockerfile: 1
