@@ -12,13 +12,14 @@ jobs:
       with:
         submodules: true
 
-    - uses: philips-software/docker-ci-scripts@sign-docker-image
+    - uses: philips-software/docker-ci-scripts@add-sbom
       id: docker
       with:
         dockerfile: 1
         image-name: test-image 
         tags: 'latest 1 1.2 1.2.1'
         slsa-provenance: true
+        sbom: true
         sign: true
       env:
         DOCKER_USERNAME: jeroenknoops 
