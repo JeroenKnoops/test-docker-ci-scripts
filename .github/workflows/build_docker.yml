@@ -12,7 +12,7 @@ jobs:
       with:
         submodules: true
 
-    - uses: philips-software/docker-ci-scripts@add-sbom
+    - uses: philips-software/docker-ci-scripts@v4.5.1
       id: docker
       with:
         dockerfile: 1
