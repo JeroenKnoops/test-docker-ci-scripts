@@ -4,7 +4,7 @@ name: test
 
 jobs:
   build:
-    name: Build docker image 
+    name: Build docker image
     runs-on: ubuntu-20.04
 
     permissions:
@@ -23,6 +23,31 @@ jobs:
         image-name: test-image 
         tags: 'latest 1 1.3 1.3.0'
         push-branches: keyless
+      env:
+        DOCKER_USERNAME: jeroenknoops 
+        DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
+        DOCKER_ORGANIZATION: jeroenknoops
+
+  build-keyless:
+    name: Build docker image - sign keyless
+    runs-on: ubuntu-20.04
+
+    permissions:
+      packages: write
+      id-token: write
+      
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+
+    - uses: philips-software/docker-ci-scripts@keyless
+      id: docker
+      with:
+        dockerfile: 1
+        image-name: test-image-keyless
+        tags: 'latest 1 1.3 1.3.0'
+        push-branches: keyless
         slsa-provenance: true
         sbom: true
         sign: true
@@ -31,3 +56,33 @@ jobs:
         DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
         DOCKER_ORGANIZATION: jeroenknoops
         KEYLESS: true
+
+  build-keys:
+    name: Build docker image - sign with own keys
+    runs-on: ubuntu-20.04
+
+    permissions:
+      packages: write
+      id-token: write
+      
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: true
+    - uses: philips-software/docker-ci-scripts@keyless
+      id: docker
+      with:
+        dockerfile: 1
+        image-name: test-image-keys
+        tags: 'latest 1 1.3 1.3.0'
+        push-branches: keyless
+        slsa-provenance: true
+        sbom: true
+        sign: true
+      env:
+        DOCKER_USERNAME: jeroenknoops 
+        DOCKER_PASSWORD: '${{ secrets.DOCKER_PASSWORD }}'
+        DOCKER_ORGANIZATION: jeroenknoops
+        COSIGN_PRIVATE_KEY: '${{ secrets.COSIGN_PRIVATE_KEY }}'
+        COSIGN_PASSWORD: '${{ secrets.COSIGN_PASSWORD }}'
+        COSIGN_PUBLIC_KEY: '${{ secrets.COSIGN_PUBLIC_KEY  }}'
